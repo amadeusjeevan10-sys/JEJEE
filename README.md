@@ -78,11 +78,14 @@ Karena formatnya pertanyaan, sesekali harus dijawab **"SKIP, jangan beli"**.
 
 ### Identitas visual
 
-- **Stempel vonis konsisten** di tiap video: kotak hijau `BELI`, kotak merah `SKIP`.
-  Untuk akun faceless, konsistensi visual ini pengganti wajah — orang kenal
-  akunmu di FYP sebelum baca namanya.
+- **Stempel vonis konsisten** di tiap video: kotak hijau `BELI` (`#22C55E`),
+  kotak merah `SKIP` (`#EF4444`). Untuk akun faceless, konsistensi visual ini
+  pengganti wajah — orang kenal akunmu di FYP sebelum baca namanya.
 - **Penomoran seri**: "Beli Ga Ya #1, #2, #3..." — memancing tonton berturut-turut
   dan mendorong follow
+
+Palet warna lengkap, tipografi, dan prompt desain foto profil ada di
+[identitas-visual.md](identitas-visual.md).
 
 ---
 
