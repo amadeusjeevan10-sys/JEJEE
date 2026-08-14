@@ -9,26 +9,80 @@ bukan tebak-tebakan. Diperbarui seiring keputusan diambil.
 
 | Item | Keputusan | Status |
 |---|---|---|
-| Nama akun (username) | `@temuanmurah.id` | ✅ Dipilih — belum dicek ketersediaan |
-| Display name | `Temuan Murah \| Barang Berguna < 100rb` | 📝 Draft |
-| Format konten | Faceless | ✅ Dipilih |
+| Nama akun (username) | `@beligaya` | ✅ Dipilih — masih sedikit yang pakai |
+| Display name | `Beli Ga Ya \| Cek Barang Murah Sebelum Checkout` | 📝 Draft |
+| Format konten | Faceless, format vonis BELI/SKIP | ✅ Dipilih |
 | Niche | Gadget & barang berguna sehari-hari | 🔶 Belum final |
 | Produk pertama | Belum ditentukan | ⏳ |
 
-### Kenapa `@temuanmurah.id`
+Cadangan kalau `@beligaya` ternyata terpakai: `@beligaya.id`, `@beliganya`,
+`@beligayaa`
 
-- Kata "murah" adalah kata kunci yang benar-benar diketik orang di pencarian TikTok
-- Luwes ke semua kategori produk — tidak mengunci ke satu jenis barang
-- Mudah diingat dan diketik, tanpa angka acak yang terbaca sebagai bot
-- Bisa divariasikan konsisten kalau nanti ternak akun:
-  `@temuanmurah.id`, `@temuanmurah.rumah`, `@temuanmurah.gadget`
+### Kenapa `@beligaya`
+
+Namanya bukan cuma label — **ini format konten**.
+
+- Dibaca "Beli Ga Ya" — persis monolog di kepala orang sedetik sebelum checkout
+- Terbaca juga sebagai "beli gaya", jadi dua makna dalam satu nama
+- Pertanyaan di detik pertama membuka *curiosity gap* → alat retensi bawaan
+- Selaras dengan positioning: keputusan dari data, bukan feeling
+- Masih sepi kompetitor, tidak seperti nama berbasis kata kunci umum
+  (`temuanmurah`, `cobainaja`, dll. sudah dipakai ribuan akun)
+
+**Catatan strategi nama:** username tidak perlu mengandung kata kunci. Yang
+diindeks pencarian TikTok adalah **display name**. Jadi username bisa unik dan
+brandable, sementara kata kunci ditaruh di display name.
+
+### Draft bio
+
+```
+Beli ga ya? Aku cek datanya dulu.
+Barang murah yang beneran kepake.
+Ga semua aku bilang beli 👇
+```
+
+Baris ketiga bekerja paling keras — langsung memberi tahu pengunjung baru bahwa
+ini bukan akun jualan biasa.
 
 ### To-do nama akun
 
-- [ ] Cek ketersediaan username di TikTok
+- [ ] Cek ketersediaan `@beligaya` di TikTok
 - [ ] Cek ketersediaan di Instagram (untuk konsistensi kalau ekspansi)
-- [ ] Finalkan display name
-- [ ] Tulis bio
+- [ ] Set display name
+- [ ] Pasang bio
+- [ ] Bikin aset stempel vonis `BELI` (hijau) dan `SKIP` (merah)
+
+---
+
+## Format Konten: "Beli Ga Ya"
+
+Nama akun memberi struktur video bawaan yang bagus untuk retensi.
+
+### Struktur per video (25 detik)
+
+| Detik | Isi |
+|---|---|
+| 0–2 | Tunjukkan produk + teks besar **"BELI GA YA?"** |
+| 2–12 | Data: harga, rating, terjual berapa, kekurangannya apa |
+| 12–20 | Demo singkat |
+| 20–25 | **Vonis: BELI atau SKIP** + CTA keranjang kuning |
+
+### Aturan wajib: berani bilang SKIP
+
+Karena formatnya pertanyaan, sesekali harus dijawab **"SKIP, jangan beli"**.
+
+- Rasio sehat: sekitar **1 dari 5 video** kasih vonis SKIP
+- Trust naik drastis — penonton tahu kamu bukan affiliator asal jual
+- Justru menaikkan konversi saat vonisnya BELI, karena rekomendasi jadi berbobot
+- Video SKIP cenderung dapat engagement tinggi ("untung dikasih tau")
+
+### Identitas visual
+
+- **Stempel vonis konsisten** di tiap video: kotak hijau `BELI`, kotak merah `SKIP`.
+  Untuk akun faceless, konsistensi visual ini pengganti wajah — orang kenal
+  akunmu di FYP sebelum baca namanya.
+- **Penomoran seri**: "Beli Ga Ya #1, #2, #3..." — memancing tonton berturut-turut
+  dan mendorong follow
 
 ---
 
@@ -222,8 +276,9 @@ adalah program **B2B** untuk mereferensikan advertiser baru ke TikTok Ads —
 
 ## Langkah Berikutnya
 
-- [ ] Cek ketersediaan `@temuanmurah.id` di TikTok & Instagram
+- [ ] Cek ketersediaan `@beligaya` di TikTok & Instagram
 - [ ] Set display name + bio
+- [ ] Bikin aset stempel vonis BELI/SKIP
 - [ ] Finalkan niche (gadget saja, atau campur rumah tangga)
 - [ ] Add 3 produk shortlist di Affiliate Center
 - [ ] Ajukan free sample Goojodoq + refundable sample VIZORA
