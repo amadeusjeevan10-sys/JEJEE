@@ -248,9 +248,41 @@ Jangan gunakan kata "review" kalau belum memegang barangnya. Pakai framing
 |---|---|---|
 | Voice over | **TTS bawaan TikTok/CapCut** | Sering perform lebih baik dari AI voice premium — terasa native platform, dan gratis |
 | Voice alternatif | ElevenLabs (Indonesia) | Kalau mau lebih natural/berkarakter |
-| Video AI (b-roll) | Kling, Veo, Higgsfield | Hanya untuk adegan yang tidak bisa disyuting sendiri |
+| Video AI (b-roll) | Kling, **Google Flow (Veo)**, Higgsfield | Hanya untuk adegan yang tidak bisa disyuting sendiri |
 | Editing | **CapCut** | Native ke TikTok |
 | Musik | **Trending sound TikTok** | Faktor algoritma besar — jangan pakai musik AI |
+
+### Pakai Google Flow — di mana posisinya
+
+Google Flow (labs.google/flow, ditenagai model Veo) adalah tool text/image-to-video
+dari Google. Untuk akun ini, posisinya **hanya di segmen "masalah"**, bukan di
+segmen produk — sesuai Aturan Emas di atas.
+
+**Kapan pakai:**
+- Detik 3–8 pada struktur video MICRONIX (adegan "suara HP pecah saat nyanyi") —
+  ini contoh persis skenario yang boleh AI, karena bukan produk yang direkam
+- Adegan mood/konteks apa pun sebelum produk muncul: ruangan berantakan, orang
+  kesal, situasi sehari-hari yang jadi alasan orang butuh produknya
+
+**Kapan JANGAN pakai:**
+- Merender produk itu sendiri (lihat tier C — "produk full render AI" — di
+  atas: risiko akun kalau barang asli beda dari yang di video)
+- Menggantikan segmen demo (detik 8–18) — itu wajib footage asli
+
+**Cara kerja praktis:**
+1. Tulis prompt dengan pola yang sudah ada di bagian "Contoh prompt b-roll" —
+   deskriptif, sinematik, hindari menyebut merek/nama produk di prompt
+2. Generate klip pendek (beberapa detik), pilih take terbaik
+3. Download, potong di CapCut, sandingkan dengan footage produk asli —
+   transisi dari adegan AI (masalah) ke footage asli (solusi) itu sendiri
+   jadi hook visual
+4. **Wajib** tandai video sebagai AIGC sesuai kebijakan TikTok kalau ada
+   segmen yang dihasilkan AI — jangan skip label ini, karena konten AI tanpa
+   label berisiko kena pengurangan distribusi (sudah dicatat di atas)
+
+**Langganan:** akses Flow butuh Google AI Pro/Ultra (Gemini subscription) —
+kalau volume produksi masih rendah (3–5 video testing), cek dulu apakah
+kuota gratis/trial cukup sebelum komit ke paket berbayar.
 
 ### Catatan penulisan teks
 
