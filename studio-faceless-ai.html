@@ -1,4 +1,4 @@
-<title>Studio Faceless AI</title>
+<title>Studio Konten Brand</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap">
@@ -137,9 +137,9 @@ pre.prompt{font-family:var(--f-mono);font-size:12px;white-space:pre-wrap;word-br
 <div class="wrap">
   <header class="top">
     <div>
-      <div class="eyebrow"><span class="rec" aria-hidden="true"></span> Kantor AI · Tim Kreatif Faceless</div>
-      <h1 id="title">Studio Tanpa Wajah</h1>
-      <p class="lede">Satu AI dibagi jadi tim kreatif. Mereka meeting berurutan, saling oper ide, dan menutup rapat dengan prompt storyboard siap pakai untuk video faceless.</p>
+      <div class="eyebrow"><span class="rec" aria-hidden="true"></span> Kantor AI · Tim Konten Brand</div>
+      <h1 id="title">Studio Cerita Brand</h1>
+      <p class="lede">Satu AI dibagi jadi tim kreatif. Mereka meeting berurutan, saling oper ide, dan menutup rapat dengan prompt storyboard siap pakai untuk konten brand atau tempatmu.</p>
     </div>
     <div class="tc" id="tc" aria-label="Durasi rapat">TC 00:00:00:00</div>
   </header>
@@ -172,6 +172,10 @@ pre.prompt{font-family:var(--f-mono);font-size:12px;white-space:pre-wrap;word-br
         <div class="step">
           <div class="step-h"><span class="n">01</span><h3>Tulis brief</h3></div>
           <div>
+            <label class="lbl" for="brand">Brand / tempat</label>
+            <input type="text" id="brand" maxlength="60" placeholder="Contoh: Kedai Rimbun, kafe kebun di Bandung">
+          </div>
+          <div>
             <label class="lbl" for="brief">Brief konten</label>
             <textarea id="brief" rows="4"></textarea>
           </div>
@@ -180,8 +184,8 @@ pre.prompt{font-family:var(--f-mono);font-size:12px;white-space:pre-wrap;word-br
               <select id="platform"><option>TikTok</option><option>Instagram Reels</option><option>YouTube Shorts</option><option>YouTube (16:9)</option></select></div>
             <div><label class="lbl" for="dur">Durasi</label>
               <select id="dur"><option value="15">15 detik</option><option value="30">30 detik</option><option value="60">60 detik</option><option value="90">90 detik</option></select></div>
-            <div><label class="lbl" for="faceless">Gaya faceless</label>
-              <select id="faceless"><option>Tangan & POV</option><option>B-roll + voice-over</option><option>Karakter animasi/3D</option><option>Teks kinetik</option><option>Siluet & bayangan</option><option>Bebas, biar tim memilih</option></select></div>
+            <div><label class="lbl" for="kind">Jenis konten</label>
+              <select id="kind"><option>Profil tempat / tur</option><option>Promo produk / menu</option><option>Behind the scenes</option><option>Testimoni pelanggan</option><option>Edukasi / tips</option><option>Event / launching</option><option>Bebas, biar tim memilih</option></select></div>
           </div>
           <div class="row">
             <button class="btn primary" id="copyPrompt">Salin perintah & mulai meeting</button>
@@ -249,7 +253,7 @@ pre.prompt{font-family:var(--f-mono);font-size:12px;white-space:pre-wrap;word-br
   <section class="panel" id="p-guide" hidden>
     <div class="guide">
       <div class="g"><span class="k">LANGKAH 1</span><h3>Bangun timmu</h3><p>Di tab Atur Kantor, beri nama studio, pilih 1–4 ruang kerja, lalu isi sampai 12 staf. Tiap staf punya satu peran.</p></div>
-      <div class="g"><span class="k">LANGKAH 2</span><h3>Tulis brief</h3><p>Ceritakan topik, penonton, dan tujuan video. Pilih platform, durasi, dan gaya faceless.</p></div>
+      <div class="g"><span class="k">LANGKAH 2</span><h3>Tulis brief</h3><p>Isi nama brand atau tempat, lalu ceritakan keunikan, penonton, dan tujuan videonya. Pilih platform, durasi, dan jenis konten.</p></div>
       <div class="g"><span class="k">LANGKAH 3</span><h3>Salin dan tempel</h3><p>Tekan Salin perintah. Staf berjalan ke ruang meeting. Tempel perintah ke Claude, ChatGPT, atau Gemini.</p></div>
       <div class="g"><span class="k">LANGKAH 4</span><h3>Pecah jawabannya</h3><p>Salin seluruh jawaban AI ke kotak 02. Tiap orang mendapat kartu sendiri, dan karakternya ikut bicara di kantor.</p></div>
       <div class="g"><span class="k">LANGKAH 5</span><h3>Pakai storyboard</h3><p>Salin prompt storyboard ke Midjourney, Higgsfield, Ideogram, atau alat gambar lain. Satu panel, satu gambar.</p></div>
@@ -263,15 +267,15 @@ pre.prompt{font-family:var(--f-mono);font-size:12px;white-space:pre-wrap;word-br
 <script>
 (()=>{
 const ROLES={
-  riset:{label:'Riset & Referensi',color:'#8DB3D6',task:'Cari 3 referensi atau tren yang relevan, satu fakta pendukung, dan apa yang sudah terlalu sering dipakai di platform ini.'},
-  strategi:{label:'Strategist',color:'#E7B44C',task:'Tentukan target penonton, insight, satu pesan utama, dan tujuan video (views, save, share, follow, atau klik).'},
+  riset:{label:'Riset & Referensi',color:'#8DB3D6',task:'Cari 3 referensi konten dari brand atau tempat sejenis, satu keunikan brand ini yang jarang diangkat, dan gaya yang sudah terlalu sering dipakai kompetitor.'},
+  strategi:{label:'Strategist',color:'#E7B44C',task:'Tentukan target penonton, insight, satu pesan utama brand, tujuan video (datang, beli, save, share, atau follow), dan ajakan (CTA).'},
   hook:{label:'Hook Specialist',color:'#E5745B',task:'Tulis 3 opsi hook untuk 0–3 detik pertama (visual + teks layar), lalu pilih satu yang terkuat beserta alasannya.'},
   cd:{label:'Creative Director',color:'#B07CC6',task:'Putuskan satu konsep besar dan alur cerita, dan pilih hook yang dipakai.'},
   naskah:{label:'Scriptwriter',color:'#5FB49C',task:'Tulis naskah voice-over dan teks layar per rentang detik, pas dengan durasi.'},
-  ad:{label:'Art Director',color:'#E98AA8',task:'Tentukan gaya visual faceless: palet warna, cahaya, lensa, tekstur, dan aturan framing supaya wajah tidak pernah terlihat.'},
-  suara:{label:'Voice & Sound',color:'#7C9A5A',task:'Tentukan karakter suara VO, musik (genre dan BPM), efek suara, dan momen beat-drop.'},
+  ad:{label:'Art Director',color:'#E98AA8',task:'Tentukan gaya visual yang sesuai identitas brand: palet warna, cahaya, lensa, tekstur, dan cara terbaik menampilkan produk, tempat, dan orangnya.'},
+  suara:{label:'Voice & Sound',color:'#7C9A5A',task:'Tentukan suara VO atau suara asli di lokasi, musik (genre dan BPM), efek suara, dan momen beat-drop.'},
   editor:{label:'Editor',color:'#6F86C9',task:'Tentukan ritme potongan, transisi, gaya caption, dan cara membuat video berulang (loop) dengan mulus.'},
-  produser:{label:'Producer',color:'#C99B6B',task:'Cek kelayakan produksi: shot yang bisa direkam sendiri, properti, lokasi, dan perkiraan waktu.'},
+  produser:{label:'Producer',color:'#C99B6B',task:'Cek kelayakan syuting di lokasi: daftar shot, talent atau model, properti, jam syuting terbaik, izin tempat, dan perkiraan waktu.'},
   storyboard:{label:'Storyboard Artist',color:'#4C4C56',task:'Rangkum semua keputusan tim menjadi storyboard per panel.'}
 };
 const ORDER=['riset','strategi','hook','cd','naskah','ad','suara','editor','produser','storyboard'];
@@ -279,59 +283,60 @@ const PANELS={15:5,30:8,60:12,90:16};
 const MAX_STAFF=12, MAX_ROOMS=4, PER_ROOM=4;
 const ROOM_TOK=['--r1','--r2','--r3','--r4'];
 
-const SAMPLE_BRIEF='Akun faceless tentang kopi rumahan. Buat video yang bikin anak kos ingin mencoba seduh V60 pertamanya di rumah, tanpa alat mahal.';
+const SAMPLE_BRAND='Kedai Rimbun, kafe kebun di Lembang, Bandung';
+const SAMPLE_BRIEF='Buat orang ingin datang akhir pekan ini. Tonjolkan suasana kebun yang sejuk dan menu andalan es kopi pandan. Target: anak muda Bandung dan Jakarta yang cari tempat nongkrong adem.';
 const SAMPLE_ANSWER=`### Arka | Riset & Referensi
-- Tren "slow morning coffee" ASMR masih kuat, tapi kebanyakan memakai alat mahal (grinder elektrik, timbangan pintar).
-- Celah: hampir tidak ada yang menunjukkan V60 dengan alat seadanya (gelas, sendok, termos).
-- Fakta: rasio 1:15 (15 g kopi untuk 225 ml air) cukup untuk satu cangkir.
+- Kafe kebun di Lembang hampir semuanya membuka video dengan drone shot. Penonton sudah bosan.
+- Keunikan Rimbun yang jarang diangkat: kopi pandan memakai daun pandan dari kebun sendiri, dipetik di depan tamu.
+- Referensi gaya: konten "pesan → dibuat → disajikan" dalam satu alur terus-menerus.
 
 ### Laras | Strategist
-Penonton: anak kos dan pekerja 20–28 tahun yang biasa beli kopi susu tiap pagi. Insight: mereka mengira seduh manual itu ribet dan mahal. Pesan utama: "V60 pertamamu cukup modal 3 alat dapur." Tujuan: save dan share ke teman.
+Penonton: 20–30 tahun, Bandung dan Jakarta, cari tempat adem untuk akhir pekan. Insight: mereka capek dengan kafe yang ramai dan panas. Pesan utama: "Di Rimbun, kopimu dipetik dulu dari kebun." Tujuan: save, lalu datang. CTA: "Tag teman yang harus kamu ajak Sabtu ini."
 
 ### Kail | Hook Specialist
-1. Tangan menuang air panas, teks: "Berhenti beli kopi 25 ribu."
-2. Overhead tiga alat dapur, teks: "Cuma ini alatnya."
-3. Close-up tetes pertama, teks: "Suara ini lebih enak dari alarm."
-Pilihan: nomor 2, karena langsung menjawab rasa takut "ribet".
+1. Tangan barista memetik daun pandan, teks: "Kopimu dipetik dulu."
+2. Suara hujan dan kabut di kebun, teks: "Bandung lagi 18°C."
+3. Close-up es kopi hijau dituang, teks: "Kopi warna apa ini?"
+Pilihan: nomor 1. Langsung menunjukkan keunikan yang tidak dimiliki kafe lain.
 
 ### Bima | Creative Director
-Konsep: "Ritual 3 Alat". Satu pagi dari gelap ke terang, kamera hanya di tangan dan meja. Alur: hook alat → langkah seduh → tetes pertama → cangkir diangkat keluar frame → kembali ke meja di awal. Pakai hook nomor 2.
+Konsep: "Dari Kebun ke Gelas". Satu alur tanpa putus: barista memetik pandan → masuk dapur → kopi dibuat → diantar ke meja tamu di tengah kebun → tamu tertawa bersama teman. Pakai hook nomor 1, penutup di meja dengan logo Rimbun.
 
 ### Sajak | Scriptwriter
-0–3s VO: "Kopi enak pagi ini cuma butuh tiga alat." Layar: CUMA INI ALATNYA
-3–9s VO: "Lima belas gram kopi, giling kasar seperti gula pasir."
-9–16s VO: "Basahi dulu, tunggu tiga puluh detik. Biarkan kopinya bernapas."
-16–24s VO: "Tuang pelan memutar sampai dua ratus dua puluh lima mili."
-24–30s VO: "Selamat pagi. Simpan video ini buat besok." Layar: SIMPAN UNTUK BESOK
+0–3s Layar: KOPIMU DIPETIK DULU
+3–10s VO: "Di Rimbun, pandannya dari kebun sendiri. Dipetik pagi ini."
+10–18s VO: "Diseduh jadi es kopi pandan yang wangi."
+18–25s VO: "Diminum di tengah kebun, Lembang lagi sejuk-sejuknya."
+25–30s VO: "Tag teman yang harus kamu ajak Sabtu ini." Layar: KEDAI RIMBUN · LEMBANG · BUKA 08.00
 
 ### Warna | Art Director
-Palet hangat: kayu jati, krem, cokelat kopi, aksen hijau daun. Cahaya jendela dari kiri jam 6 pagi, uap terlihat jelas. Lensa 35mm overhead dan 50mm makro. Aturan faceless: kamera tidak pernah naik di atas dada; hanya tangan, cangkir, dan siluet di kaca.
+Palet hijau daun, kayu terang, putih krem, aksen hijau pandan di gelas. Cahaya pagi yang lembut setelah hujan, sedikit kabut. Lensa 24mm untuk suasana kebun, 50mm untuk minuman. Tamu tampil natural dan tertawa, bukan berpose.
 
 ### Gema | Voice & Sound
-VO perempuan, pelan, setengah berbisik, dekat ke mikrofon. Musik lo-fi piano 80 BPM masuk di detik 3. SFX: kertas filter, air mendidih, dan tetes pertama dikeraskan di detik 9 sebagai momen ASMR.
+VO laki-laki santai seperti teman bercerita. Suara asli dipertahankan: daun dipetik, es di gelas, tawa tamu. Musik akustik gitar 95 BPM, beat masuk tepat saat kopi dituang di detik 10.
 
 ### Rangkai | Editor
-Potong tiap 2–3 detik mengikuti ketukan piano. Match-cut dari lingkaran gelas ke lingkaran cangkir. Caption putih tebal di tengah bawah. Frame terakhir sama dengan frame pertama supaya video berulang mulus.
+Transisi "ikuti tangan": tiap potongan berpindah mengikuti gerakan tangan barista supaya terasa satu alur. Potong tiap 2–3 detik. Caption kuning lembut di sepertiga bawah. Akhiri dengan logo dan info jam buka 2 detik.
 
 ### Jadwal | Producer
-Bisa direkam sendiri dalam satu pagi (±90 menit). Properti: V60 plastik, kertas filter, gelas, termos, sendok makan, cangkir. Lokasi: meja dekat jendela timur. Rekam hook dan close-up tetes dua kali sebagai cadangan.
+Syuting Sabtu pukul 07.00–09.00 sebelum ramai, cahaya masih lembut. Talent: 1 barista, 3 teman sebagai tamu (minta izin tertulis). Properti: gelas kaca bening, nampan kayu. Rekam hook dan momen tuang dua kali sebagai cadangan.
 
 ### Panel | Storyboard Artist
 Semua keputusan tim kurangkum jadi 8 panel di bawah, satu panel untuk satu gambar.
 
 ### STORYBOARD PROMPT
-Panel 1 (0–3s): overhead flat lay, 35mm — three simple tools on a teak table: plastic V60 dripper, glass, thermos — soft window light from the left, warm cream tones — on-screen text "CUMA INI ALATNYA"
-Panel 2 (3–6s): macro close-up — a hand pouring 15 g of coarse coffee grounds into a paper filter — morning light, visible texture
-Panel 3 (6–9s): side view at table height — hands folding the paper filter, steam rising from the thermos behind — shallow depth of field
-Panel 4 (9–13s): macro 50mm — first drops of coffee falling into the glass, backlit by the window — glowing amber drops
-Panel 5 (13–17s): top-down — slow spiral pour from the thermos, coffee bloom bubbling — rich brown and cream
-Panel 6 (17–22s): three-quarter view, chest-down only — hands holding the glass against the window, soft silhouette, no face visible
-Panel 7 (22–27s): close-up — the cup lifted out of frame, empty table with a coffee ring, brighter light
-Panel 8 (27–30s): overhead, identical to Panel 1 for a seamless loop — on-screen text "SIMPAN UNTUK BESOK"
-Consistent visual style: cinematic faceless coffee ritual, warm teak and cream palette, natural 6am window light, 9:16 vertical, photorealistic, soft film grain, no faces.`;
+Panel 1 (0–3s): close-up 50mm — a barista's hand picking a fresh pandan leaf in a misty garden — soft morning light after rain, deep greens — on-screen text "KOPIMU DIPETIK DULU"
+Panel 2 (3–6s): medium shot 24mm — the barista walking along a garden path toward a small wooden coffee bar, leaf in hand — light fog, lush plants
+Panel 3 (6–10s): close-up — pandan leaves blended into syrup at a rustic wooden counter — warm wood, glass jars
+Panel 4 (10–14s): macro — espresso poured over ice and green pandan milk, layers swirling in a clear glass — backlit by window light
+Panel 5 (14–18s): medium — the barista placing two glasses on a wooden tray, smiling — cozy cafe interior with plants
+Panel 6 (18–22s): wide 24mm — a table in the middle of the garden, three friends laughing as the drinks arrive — natural candid moment
+Panel 7 (22–25s): close-up — hands clinking green iced coffees together — bokeh garden background
+Panel 8 (25–30s): wide establishing shot of the cafe garden with a wooden sign "KEDAI RIMBUN" — on-screen text "LEMBANG · BUKA 08.00"
+Consistent visual style: fresh garden cafe in Lembang, Bandung, green and light-wood palette, soft misty morning light, candid lifestyle photography, 9:16 vertical, photorealistic, warm and inviting.`;
 
 function defaults(){
-  return {studio:'Studio Tanpa Wajah',style:'chibi',
+  return {studio:'Studio Cerita Brand',style:'chibi',
     rooms:[{name:'Ruang Ide'},{name:'Ruang Visual'},{name:'Pustaka Referensi'},{name:'Ruang Suara'}],
     staff:[
       {name:'Laras',role:'strategi',room:0},{name:'Bima',role:'cd',room:0},{name:'Sajak',role:'naskah',room:0},{name:'Kail',role:'hook',room:0},
@@ -339,9 +344,9 @@ function defaults(){
       {name:'Arka',role:'riset',room:2},{name:'Jadwal',role:'produser',room:2},
       {name:'Gema',role:'suara',room:3},{name:'Rangkai',role:'editor',room:3}
     ].map((s,i)=>({...s,id:'s'+i})),
-    brief:SAMPLE_BRIEF,platform:'TikTok',dur:'30',faceless:'Tangan & POV',answer:SAMPLE_ANSWER,isSample:true};
+    brand:SAMPLE_BRAND,brief:SAMPLE_BRIEF,platform:'Instagram Reels',dur:'30',kind:'Profil tempat / tur',answer:SAMPLE_ANSWER,isSample:true};
 }
-const KEY='studio-faceless-ai-v1';
+const KEY='studio-konten-brand-v2';
 let S;
 try{S=JSON.parse(localStorage.getItem(KEY)||'null')}catch(e){S=null}
 if(!S||!Array.isArray(S.staff))S=defaults();
@@ -355,10 +360,11 @@ function orderedStaff(){return S.staff.slice().sort((a,b)=>ORDER.indexOf(a.role)
 function buildPrompt(){
   const team=orderedStaff(), n=PANELS[S.dur]||8, wide=S.platform.includes('16:9');
   const L=[];
-  L.push(`Kamu akan memerankan tim kreatif "${S.studio}" yang sedang meeting untuk membuat satu video faceless (tanpa menampilkan wajah orang).`);
+  L.push(`Kamu akan memerankan tim kreatif "${S.studio}" yang sedang meeting untuk membuat satu video konten untuk sebuah brand atau tempat.`);
   L.push('');
+  L.push(`BRAND / TEMPAT: ${(S.brand||'').trim()||'(lihat brief)'}`);
   L.push(`BRIEF: ${S.brief.trim()||'(belum diisi)'}`);
-  L.push(`PLATFORM: ${S.platform} | FORMAT: ${wide?'16:9 horizontal':'9:16 vertikal'} | DURASI: ${S.dur} detik | GAYA FACELESS: ${S.faceless}`);
+  L.push(`PLATFORM: ${S.platform} | FORMAT: ${wide?'16:9 horizontal':'9:16 vertikal'} | DURASI: ${S.dur} detik | JENIS KONTEN: ${S.kind}`);
   L.push('');
   L.push('ANGGOTA TIM. Mereka bicara berurutan, dan tiap orang membaca serta membangun dari keputusan orang sebelumnya:');
   team.forEach((s,i)=>L.push(`${i+1}. ${s.name} (${ROLES[s.role].label}): ${ROLES[s.role].task}`));
@@ -366,11 +372,11 @@ function buildPrompt(){
   L.push('ATURAN:');
   L.push('- Awali bagian setiap orang dengan baris persis seperti ini: ### Nama | Peran');
   L.push('- Bahasa Indonesia, ringkas, paling banyak sekitar 90 kata per orang. Boleh tidak setuju dengan orang sebelumnya kalau ada alasan.');
-  L.push('- Wajah manusia tidak boleh terlihat. Pakai tangan, POV, b-roll, siluet, teks layar, voice-over, atau karakter animasi.');
+  L.push('- Konten harus terasa milik brand atau tempat ini: sebut namanya, tonjolkan ciri khas dan suasananya, jangan generik. Tutup video dengan ajakan (CTA) yang jelas.');
   L.push(`- Setelah semua orang bicara, tutup dengan baris: ### STORYBOARD PROMPT`);
   L.push(`  Lalu tulis tepat ${n} panel dalam bahasa Inggris (siap ditempel ke alat gambar AI), satu baris per panel:`);
-  L.push('  Panel N (detik a–b): [shot & lensa] — [subjek & aksi, tanpa wajah] — [setting, cahaya, warna] — [teks layar bila ada]');
-  L.push(`  Akhiri dengan satu baris "Consistent visual style: ..." yang berlaku untuk semua panel, termasuk rasio ${wide?'16:9':'9:16'} dan "no faces".`);
+  L.push('  Panel N (detik a–b): [shot & lensa] — [subjek & aksi] — [setting, cahaya, warna] — [teks layar bila ada]');
+  L.push(`  Akhiri dengan satu baris "Consistent visual style: ..." yang berlaku untuk semua panel, termasuk rasio ${wide?'16:9':'9:16'} dan suasana khas brand.`);
   return L.join('\n');
 }
 
@@ -444,13 +450,13 @@ function setStatus(el,msg,err){el.textContent=msg;el.classList.toggle('err',!!er
 
 /* ---------- meeting controls ---------- */
 function syncMeetingInputs(){
-  $('brief').value=S.brief;$('platform').value=S.platform;$('dur').value=S.dur;$('faceless').value=S.faceless;$('answer').value=S.answer||'';
+  $('brand').value=S.brand||'';$('brief').value=S.brief;$('platform').value=S.platform;$('dur').value=S.dur;$('kind').value=S.kind||'Bebas, biar tim memilih';$('answer').value=S.answer||'';
   $('promptPre').textContent=buildPrompt();
   $('hudFmt').textContent=`● REC · ${S.platform.includes('16:9')?'16:9':'9:16'} · ${S.dur}s`;
 }
-['brief','platform','dur','faceless'].forEach(k=>$(k).addEventListener('input',()=>{S[k]=$(k).value;save();$('promptPre').textContent=buildPrompt();$('hudFmt').textContent=`● REC · ${S.platform.includes('16:9')?'16:9':'9:16'} · ${S.dur}s`}));
+['brand','brief','platform','dur','kind'].forEach(k=>$(k).addEventListener('input',()=>{S[k]=$(k).value;save();$('promptPre').textContent=buildPrompt();$('hudFmt').textContent=`● REC · ${S.platform.includes('16:9')?'16:9':'9:16'} · ${S.dur}s`}));
 $('copyPrompt').addEventListener('click',()=>{
-  if(!S.brief.trim()){setStatus($('st1'),'Brief masih kosong. Tulis dulu topik dan tujuan videonya.',true);$('brief').focus();return}
+  if(!S.brief.trim()){setStatus($('st1'),'Brief masih kosong. Tulis dulu keunikan brand dan tujuan videonya.',true);$('brief').focus();return}
   const p=buildPrompt();$('promptPre').textContent=p;
   copyText(p,$('st1'),'Perintah tersalin. Tim menuju ruang meeting. Tempel ke AI pilihanmu.',$('promptPre'));
   startMeeting();
