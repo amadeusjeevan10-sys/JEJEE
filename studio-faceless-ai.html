@@ -1,0 +1,788 @@
+<title>Studio Faceless AI</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: a camera-HUD framed isometric office on top, a three-step meeting desk below (brief → paste → storyboard). */
+:root{
+  --bg:#ECEEE8; --surface:#FAFBF7; --surface-2:#F2F4EE; --ink:#1D2320; --muted:#5C6660; --line:#D5DAD2;
+  --accent:#D63F37; --accent-ink:#FFFFFF; --ok:#2F7D4F;
+  --slab:#C6CCC1; --wall:#E0E3DA; --corr:#F0F1EB; --sign:#22282A; --sign-ink:#F4F1E8;
+  --r1:#F3DE9E; --r2:#F5C9AE; --r3:#C7E2C1; --r4:#BFD6EE; --meet:#D8D2EC; --lounge:#F1CDD5; --garden:#BCDAA6; --tree:#5F9A5C;
+  --wood:#C9A27A; --desk:#EADFCC; --screen:#2B3236;
+  --f-display:"Bricolage Grotesque", "Avenir Next", system-ui, sans-serif;
+  --f-body:"Plus Jakarta Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-mono:"JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#131615; --surface:#1B1F1D; --surface-2:#222724; --ink:#E6EAE3; --muted:#9BA59F; --line:#30362F;
+  --accent:#F0605A; --accent-ink:#1A0B0A; --ok:#6CC08F;
+  --slab:#2A2F2C; --wall:#363C38; --corr:#3B413D; --sign:#0C0E0D; --sign-ink:#F4F1E8;
+  --r1:#8C7D4B; --r2:#8D6955; --r3:#5B7B57; --r4:#53708C; --meet:#676185; --lounge:#875C66; --garden:#4D6A44; --tree:#7DB077;
+  --wood:#8B6C4F; --desk:#A99A82; --screen:#0E1113; color-scheme:dark; } }
+:root[data-theme="dark"]{
+  --bg:#131615; --surface:#1B1F1D; --surface-2:#222724; --ink:#E6EAE3; --muted:#9BA59F; --line:#30362F;
+  --accent:#F0605A; --accent-ink:#1A0B0A; --ok:#6CC08F;
+  --slab:#2A2F2C; --wall:#363C38; --corr:#3B413D; --sign:#0C0E0D; --sign-ink:#F4F1E8;
+  --r1:#8C7D4B; --r2:#8D6955; --r3:#5B7B57; --r4:#53708C; --meet:#676185; --lounge:#875C66; --garden:#4D6A44; --tree:#7DB077;
+  --wood:#8B6C4F; --desk:#A99A82; --screen:#0E1113; color-scheme:dark; }
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.55;
+  padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px));padding-block:20px 48px}
+.wrap{max-width:1180px;margin:0 auto;display:flex;flex-direction:column;gap:20px}
+h1,h2,h3{font-family:var(--f-display);text-wrap:balance;margin:0;line-height:1.08}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+/* header */
+.top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px 24px}
+.eyebrow{font-family:var(--f-mono);font-size:11.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);display:flex;align-items:center;gap:8px}
+.rec{width:9px;height:9px;border-radius:50%;background:var(--accent);animation:blink 1.6s steps(2) infinite}
+@keyframes blink{50%{opacity:.25}}
+h1{font-size:clamp(34px,6vw,64px);font-weight:800;letter-spacing:-.02em;margin-top:6px}
+.lede{color:var(--muted);max-width:56ch;margin:8px 0 0;font-size:16px}
+.tc{font-family:var(--f-mono);font-size:13px;font-variant-numeric:tabular-nums;border:1px solid var(--line);background:var(--surface);padding:6px 10px;border-radius:6px;white-space:nowrap}
+
+/* stage */
+.stage{position:relative;background:var(--surface-2);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.stage canvas{display:block;width:100%;cursor:grab;touch-action:pan-y}
+.stage canvas:active{cursor:grabbing}
+.hud{position:absolute;inset:10px 10px auto 10px;display:flex;justify-content:space-between;gap:10px;pointer-events:none;align-items:flex-start}
+.hud .chip{font-family:var(--f-mono);font-size:11px;letter-spacing:.06em;background:color-mix(in srgb,var(--surface) 88%,transparent);border:1px solid var(--line);padding:4px 8px;border-radius:5px}
+.hud .note{max-width:250px;font-size:11.5px;line-height:1.4;color:var(--muted);background:color-mix(in srgb,var(--surface) 90%,transparent);border:1px solid var(--line);padding:6px 9px;border-radius:8px}
+.ctrls{position:absolute;left:10px;bottom:10px;display:flex;gap:6px;flex-wrap:wrap}
+.ctrls button{min-width:34px;height:34px;padding:0 10px;border-radius:8px;border:1px solid var(--line);background:var(--surface);cursor:pointer;font-size:13px;font-weight:600}
+.ctrls button:hover{border-color:var(--ink)}
+.ctrls .meet-btn{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+@media (max-width:560px){.hud .note{display:none}}
+
+/* tabs */
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);overflow-x:auto}
+.tab{background:none;border:0;padding:10px 14px;cursor:pointer;font-weight:600;color:var(--muted);border-bottom:2px solid transparent;margin-bottom:-1px;white-space:nowrap}
+.tab[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--accent)}
+.panel{padding-top:18px}
+
+/* meeting */
+.meeting{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:20px;align-items:start}
+@media (max-width:880px){.meeting{grid-template-columns:minmax(0,1fr)}}
+.col{display:flex;flex-direction:column;gap:16px;min-width:0}
+.step{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.step-h{display:flex;align-items:baseline;gap:10px}
+.step-h .n{font-family:var(--f-mono);font-size:12px;color:var(--accent);font-weight:600}
+.step-h h3{font-size:19px;font-weight:600}
+.hint{color:var(--muted);font-size:13.5px;margin:0}
+label.lbl{font-size:12px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px}
+textarea,input[type=text],select{width:100%;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:9px 11px}
+textarea{resize:vertical;min-height:96px}
+.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+@media (max-width:520px){.grid3{grid-template-columns:minmax(0,1fr)}}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border-radius:9px;padding:10px 16px;font-weight:700;cursor:pointer;border:1px solid var(--line);background:var(--surface)}
+.btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.btn.dark{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.status{font-size:13px;color:var(--ok);min-height:1.2em;margin:0}
+.status.err{color:var(--accent)}
+.links{font-size:13px;color:var(--muted)}
+.links a{color:var(--ink);font-weight:600}
+details.preview summary{cursor:pointer;font-size:13px;color:var(--muted)}
+pre.prompt{font-family:var(--f-mono);font-size:12px;white-space:pre-wrap;word-break:break-word;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:10px;max-height:260px;overflow:auto;margin:8px 0 0}
+
+/* results */
+.res-head{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.res-head h3{font-size:22px}
+.tag{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;border:1px dashed var(--muted);color:var(--muted);padding:2px 7px;border-radius:4px}
+.cards{display:flex;flex-direction:column;gap:8px}
+.card{display:grid;grid-template-columns:34px minmax(0,1fr);gap:10px;padding:11px 12px;border:1px solid var(--line);border-radius:10px;background:var(--surface);cursor:pointer;transition:border-color .2s}
+.card:hover{border-color:var(--muted)}
+.card.speaking{border-color:var(--ink);box-shadow:0 0 0 1px var(--ink)}
+.av{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;font-weight:700;font-size:13px;color:#1D2320}
+.card .who{font-weight:700;font-size:14px}
+.card .role{color:var(--muted);font-weight:500;font-size:12.5px}
+.card .txt{white-space:pre-wrap;font-size:13.5px;margin-top:3px;word-break:break-word}
+.sb{border:1px solid var(--ink);border-radius:12px;background:var(--surface);overflow:hidden}
+.sb-h{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 12px;background:var(--ink);color:var(--bg);flex-wrap:wrap}
+.sb-h b{font-family:var(--f-mono);font-size:12px;letter-spacing:.1em}
+.sb-h button{background:var(--bg);color:var(--ink);border:0;border-radius:7px;padding:6px 12px;font-weight:700;cursor:pointer}
+.sb pre{margin:0;padding:12px;font-family:var(--f-mono);font-size:12.5px;white-space:pre-wrap;word-break:break-word;max-height:420px;overflow:auto}
+.empty{color:var(--muted);font-size:14px;padding:18px;border:1px dashed var(--line);border-radius:10px}
+
+/* setup */
+.setup{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.6fr);gap:20px;align-items:start}
+@media (max-width:880px){.setup{grid-template-columns:minmax(0,1fr)}}
+.seg{display:flex;flex-wrap:wrap;gap:6px}
+.seg button{border:1px solid var(--line);background:var(--bg);padding:7px 12px;border-radius:999px;cursor:pointer;font-weight:600;font-size:13.5px}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.list{display:flex;flex-direction:column;gap:8px}
+.srow{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.3fr) minmax(0,1fr) 36px;gap:6px;align-items:center}
+.rrow{display:grid;grid-template-columns:14px minmax(0,1fr) 36px;gap:8px;align-items:center}
+.sw{width:14px;height:14px;border-radius:4px;border:1px solid var(--line)}
+.x{width:36px;height:36px;border-radius:8px;border:1px solid var(--line);background:var(--bg);cursor:pointer;font-size:16px;color:var(--muted)}
+.x:hover{color:var(--accent);border-color:var(--accent)}
+@media (max-width:560px){.srow{grid-template-columns:minmax(0,1fr) 36px}.srow select{grid-column:1/2}}
+.count{font-family:var(--f-mono);font-size:12px;color:var(--muted)}
+
+/* guide */
+.guide{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
+.guide .g{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px}
+.guide .g h3{font-size:17px;margin:4px 0 6px}
+.guide .g p{margin:0;color:var(--muted);font-size:14px}
+.guide .k{font-family:var(--f-mono);font-size:11.5px;color:var(--accent)}
+.roles{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:8px;margin-top:14px}
+.roles div{display:flex;gap:10px;font-size:13.5px;padding:8px 10px;border:1px solid var(--line);border-radius:9px;background:var(--surface)}
+.roles i{flex:0 0 12px;height:12px;border-radius:3px;margin-top:4px}
+@media (prefers-reduced-motion:reduce){.rec{animation:none}}
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div>
+      <div class="eyebrow"><span class="rec" aria-hidden="true"></span> Kantor AI · Tim Kreatif Faceless</div>
+      <h1 id="title">Studio Tanpa Wajah</h1>
+      <p class="lede">Satu AI dibagi jadi tim kreatif. Mereka meeting berurutan, saling oper ide, dan menutup rapat dengan prompt storyboard siap pakai untuk video faceless.</p>
+    </div>
+    <div class="tc" id="tc" aria-label="Durasi rapat">TC 00:00:00:00</div>
+  </header>
+
+  <section class="stage" aria-label="Kantor 3D">
+    <canvas id="cv" aria-label="Denah isometrik kantor dengan staf AI"></canvas>
+    <div class="hud">
+      <span class="chip" id="hudFmt">● REC · 9:16 · 30s</span>
+      <span class="note">Karakter dan gerakannya hanya animasi. Yang berpikir adalah AI tempat kamu menempel perintah.</span>
+    </div>
+    <div class="ctrls">
+      <button id="zIn" aria-label="Perbesar">+</button>
+      <button id="zOut" aria-label="Perkecil">−</button>
+      <button id="zFit">Pas</button>
+      <button id="pause">Jeda</button>
+      <button id="meetBtn" class="meet-btn">Ke ruang meeting</button>
+    </div>
+  </section>
+
+  <nav class="tabs" role="tablist">
+    <button class="tab" role="tab" aria-selected="true" data-tab="meeting">Meeting</button>
+    <button class="tab" role="tab" aria-selected="false" data-tab="setup">Atur Kantor</button>
+    <button class="tab" role="tab" aria-selected="false" data-tab="guide">Cara Pakai</button>
+  </nav>
+
+  <!-- MEETING -->
+  <section class="panel" id="p-meeting">
+    <div class="meeting">
+      <div class="col">
+        <div class="step">
+          <div class="step-h"><span class="n">01</span><h3>Tulis brief</h3></div>
+          <div>
+            <label class="lbl" for="brief">Brief konten</label>
+            <textarea id="brief" rows="4"></textarea>
+          </div>
+          <div class="grid3">
+            <div><label class="lbl" for="platform">Platform</label>
+              <select id="platform"><option>TikTok</option><option>Instagram Reels</option><option>YouTube Shorts</option><option>YouTube (16:9)</option></select></div>
+            <div><label class="lbl" for="dur">Durasi</label>
+              <select id="dur"><option value="15">15 detik</option><option value="30">30 detik</option><option value="60">60 detik</option><option value="90">90 detik</option></select></div>
+            <div><label class="lbl" for="faceless">Gaya faceless</label>
+              <select id="faceless"><option>Tangan & POV</option><option>B-roll + voice-over</option><option>Karakter animasi/3D</option><option>Teks kinetik</option><option>Siluet & bayangan</option><option>Bebas, biar tim memilih</option></select></div>
+          </div>
+          <div class="row">
+            <button class="btn primary" id="copyPrompt">Salin perintah & mulai meeting</button>
+          </div>
+          <p class="status" id="st1" role="status"></p>
+          <p class="links">Tempel ke <a href="https://claude.ai/new" target="_blank" rel="noopener">Claude</a>, <a href="https://chatgpt.com/" target="_blank" rel="noopener">ChatGPT</a>, atau <a href="https://gemini.google.com/app" target="_blank" rel="noopener">Gemini</a>. Akun gratis cukup.</p>
+          <details class="preview"><summary>Lihat isi perintah</summary><pre class="prompt" id="promptPre"></pre></details>
+        </div>
+
+        <div class="step">
+          <div class="step-h"><span class="n">02</span><h3>Tempel jawaban AI</h3></div>
+          <p class="hint">Salin seluruh jawaban AI lalu tempel di sini. Jawaban dipecah otomatis per anggota tim.</p>
+          <textarea id="answer" rows="6" placeholder="### Nama | Peran&#10;..."></textarea>
+          <div class="row">
+            <button class="btn dark" id="split">Pecah per orang</button>
+            <button class="btn" id="clearAns">Kosongkan</button>
+          </div>
+          <p class="status" id="st2" role="status"></p>
+        </div>
+      </div>
+
+      <div class="col">
+        <div class="res-head"><div class="step-h"><span class="n">03</span><h3>Hasil meeting</h3></div><span class="tag" id="sampleTag">Contoh</span></div>
+        <div class="cards" id="cards"></div>
+        <div class="sb" id="sbBox">
+          <div class="sb-h"><b>PROMPT STORYBOARD</b><button id="copySb">Salin storyboard</button></div>
+          <pre id="sbText"></pre>
+        </div>
+        <p class="status" id="st3" role="status"></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SETUP -->
+  <section class="panel" id="p-setup" hidden>
+    <div class="setup">
+      <div class="col">
+        <div class="step">
+          <div><label class="lbl" for="studio">Nama studio</label><input type="text" id="studio" maxlength="28"></div>
+          <div><span class="lbl">Gaya karakter</span>
+            <div class="seg" id="styleSeg">
+              <button data-v="manusia">Manusia</button><button data-v="hewan">Hewan imut</button><button data-v="chibi">Manusia imut</button>
+            </div></div>
+        </div>
+        <div class="step">
+          <div class="res-head"><span class="lbl" style="margin:0">Ruang kerja</span><span class="count" id="roomCount"></span></div>
+          <div class="list" id="roomList"></div>
+          <div class="row"><button class="btn" id="addRoom">Tambah ruang</button></div>
+          <p class="hint">Ruang Meeting dan Lounge selalu ada. Tiap ruang kerja muat 4 meja.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="res-head"><span class="lbl" style="margin:0">Staf</span><span class="count" id="staffCount"></span></div>
+        <div class="list" id="staffList"></div>
+        <div class="row">
+          <button class="btn" id="addStaff">Tambah staf</button>
+          <button class="btn" id="reset">Kembalikan ke contoh</button>
+        </div>
+        <p class="status" id="st4" role="status"></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- GUIDE -->
+  <section class="panel" id="p-guide" hidden>
+    <div class="guide">
+      <div class="g"><span class="k">LANGKAH 1</span><h3>Bangun timmu</h3><p>Di tab Atur Kantor, beri nama studio, pilih 1–4 ruang kerja, lalu isi sampai 12 staf. Tiap staf punya satu peran.</p></div>
+      <div class="g"><span class="k">LANGKAH 2</span><h3>Tulis brief</h3><p>Ceritakan topik, penonton, dan tujuan video. Pilih platform, durasi, dan gaya faceless.</p></div>
+      <div class="g"><span class="k">LANGKAH 3</span><h3>Salin dan tempel</h3><p>Tekan Salin perintah. Staf berjalan ke ruang meeting. Tempel perintah ke Claude, ChatGPT, atau Gemini.</p></div>
+      <div class="g"><span class="k">LANGKAH 4</span><h3>Pecah jawabannya</h3><p>Salin seluruh jawaban AI ke kotak 02. Tiap orang mendapat kartu sendiri, dan karakternya ikut bicara di kantor.</p></div>
+      <div class="g"><span class="k">LANGKAH 5</span><h3>Pakai storyboard</h3><p>Salin prompt storyboard ke Midjourney, Higgsfield, Ideogram, atau alat gambar lain. Satu panel, satu gambar.</p></div>
+      <div class="g"><span class="k">CATATAN</span><h3>Ini alat bantu brainstorm</h3><p>Yang berpikir tetap AI pilihanmu, dan keputusan tetap di kamu. Pengaturan tersimpan di browser ini saja.</p></div>
+    </div>
+    <h3 style="font-size:20px;margin-top:22px">10 peran kreatif</h3>
+    <div class="roles" id="roleGuide"></div>
+  </section>
+</div>
+
+<script>
+(()=>{
+const ROLES={
+  riset:{label:'Riset & Referensi',color:'#8DB3D6',task:'Cari 3 referensi atau tren yang relevan, satu fakta pendukung, dan apa yang sudah terlalu sering dipakai di platform ini.'},
+  strategi:{label:'Strategist',color:'#E7B44C',task:'Tentukan target penonton, insight, satu pesan utama, dan tujuan video (views, save, share, follow, atau klik).'},
+  hook:{label:'Hook Specialist',color:'#E5745B',task:'Tulis 3 opsi hook untuk 0–3 detik pertama (visual + teks layar), lalu pilih satu yang terkuat beserta alasannya.'},
+  cd:{label:'Creative Director',color:'#B07CC6',task:'Putuskan satu konsep besar dan alur cerita, dan pilih hook yang dipakai.'},
+  naskah:{label:'Scriptwriter',color:'#5FB49C',task:'Tulis naskah voice-over dan teks layar per rentang detik, pas dengan durasi.'},
+  ad:{label:'Art Director',color:'#E98AA8',task:'Tentukan gaya visual faceless: palet warna, cahaya, lensa, tekstur, dan aturan framing supaya wajah tidak pernah terlihat.'},
+  suara:{label:'Voice & Sound',color:'#7C9A5A',task:'Tentukan karakter suara VO, musik (genre dan BPM), efek suara, dan momen beat-drop.'},
+  editor:{label:'Editor',color:'#6F86C9',task:'Tentukan ritme potongan, transisi, gaya caption, dan cara membuat video berulang (loop) dengan mulus.'},
+  produser:{label:'Producer',color:'#C99B6B',task:'Cek kelayakan produksi: shot yang bisa direkam sendiri, properti, lokasi, dan perkiraan waktu.'},
+  storyboard:{label:'Storyboard Artist',color:'#4C4C56',task:'Rangkum semua keputusan tim menjadi storyboard per panel.'}
+};
+const ORDER=['riset','strategi','hook','cd','naskah','ad','suara','editor','produser','storyboard'];
+const PANELS={15:5,30:8,60:12,90:16};
+const MAX_STAFF=12, MAX_ROOMS=4, PER_ROOM=4;
+const ROOM_TOK=['--r1','--r2','--r3','--r4'];
+
+const SAMPLE_BRIEF='Akun faceless tentang kopi rumahan. Buat video yang bikin anak kos ingin mencoba seduh V60 pertamanya di rumah, tanpa alat mahal.';
+const SAMPLE_ANSWER=`### Arka | Riset & Referensi
+- Tren "slow morning coffee" ASMR masih kuat, tapi kebanyakan memakai alat mahal (grinder elektrik, timbangan pintar).
+- Celah: hampir tidak ada yang menunjukkan V60 dengan alat seadanya (gelas, sendok, termos).
+- Fakta: rasio 1:15 (15 g kopi untuk 225 ml air) cukup untuk satu cangkir.
+
+### Laras | Strategist
+Penonton: anak kos dan pekerja 20–28 tahun yang biasa beli kopi susu tiap pagi. Insight: mereka mengira seduh manual itu ribet dan mahal. Pesan utama: "V60 pertamamu cukup modal 3 alat dapur." Tujuan: save dan share ke teman.
+
+### Kail | Hook Specialist
+1. Tangan menuang air panas, teks: "Berhenti beli kopi 25 ribu."
+2. Overhead tiga alat dapur, teks: "Cuma ini alatnya."
+3. Close-up tetes pertama, teks: "Suara ini lebih enak dari alarm."
+Pilihan: nomor 2, karena langsung menjawab rasa takut "ribet".
+
+### Bima | Creative Director
+Konsep: "Ritual 3 Alat". Satu pagi dari gelap ke terang, kamera hanya di tangan dan meja. Alur: hook alat → langkah seduh → tetes pertama → cangkir diangkat keluar frame → kembali ke meja di awal. Pakai hook nomor 2.
+
+### Sajak | Scriptwriter
+0–3s VO: "Kopi enak pagi ini cuma butuh tiga alat." Layar: CUMA INI ALATNYA
+3–9s VO: "Lima belas gram kopi, giling kasar seperti gula pasir."
+9–16s VO: "Basahi dulu, tunggu tiga puluh detik. Biarkan kopinya bernapas."
+16–24s VO: "Tuang pelan memutar sampai dua ratus dua puluh lima mili."
+24–30s VO: "Selamat pagi. Simpan video ini buat besok." Layar: SIMPAN UNTUK BESOK
+
+### Warna | Art Director
+Palet hangat: kayu jati, krem, cokelat kopi, aksen hijau daun. Cahaya jendela dari kiri jam 6 pagi, uap terlihat jelas. Lensa 35mm overhead dan 50mm makro. Aturan faceless: kamera tidak pernah naik di atas dada; hanya tangan, cangkir, dan siluet di kaca.
+
+### Gema | Voice & Sound
+VO perempuan, pelan, setengah berbisik, dekat ke mikrofon. Musik lo-fi piano 80 BPM masuk di detik 3. SFX: kertas filter, air mendidih, dan tetes pertama dikeraskan di detik 9 sebagai momen ASMR.
+
+### Rangkai | Editor
+Potong tiap 2–3 detik mengikuti ketukan piano. Match-cut dari lingkaran gelas ke lingkaran cangkir. Caption putih tebal di tengah bawah. Frame terakhir sama dengan frame pertama supaya video berulang mulus.
+
+### Jadwal | Producer
+Bisa direkam sendiri dalam satu pagi (±90 menit). Properti: V60 plastik, kertas filter, gelas, termos, sendok makan, cangkir. Lokasi: meja dekat jendela timur. Rekam hook dan close-up tetes dua kali sebagai cadangan.
+
+### Panel | Storyboard Artist
+Semua keputusan tim kurangkum jadi 8 panel di bawah, satu panel untuk satu gambar.
+
+### STORYBOARD PROMPT
+Panel 1 (0–3s): overhead flat lay, 35mm — three simple tools on a teak table: plastic V60 dripper, glass, thermos — soft window light from the left, warm cream tones — on-screen text "CUMA INI ALATNYA"
+Panel 2 (3–6s): macro close-up — a hand pouring 15 g of coarse coffee grounds into a paper filter — morning light, visible texture
+Panel 3 (6–9s): side view at table height — hands folding the paper filter, steam rising from the thermos behind — shallow depth of field
+Panel 4 (9–13s): macro 50mm — first drops of coffee falling into the glass, backlit by the window — glowing amber drops
+Panel 5 (13–17s): top-down — slow spiral pour from the thermos, coffee bloom bubbling — rich brown and cream
+Panel 6 (17–22s): three-quarter view, chest-down only — hands holding the glass against the window, soft silhouette, no face visible
+Panel 7 (22–27s): close-up — the cup lifted out of frame, empty table with a coffee ring, brighter light
+Panel 8 (27–30s): overhead, identical to Panel 1 for a seamless loop — on-screen text "SIMPAN UNTUK BESOK"
+Consistent visual style: cinematic faceless coffee ritual, warm teak and cream palette, natural 6am window light, 9:16 vertical, photorealistic, soft film grain, no faces.`;
+
+function defaults(){
+  return {studio:'Studio Tanpa Wajah',style:'chibi',
+    rooms:[{name:'Ruang Ide'},{name:'Ruang Visual'},{name:'Pustaka Referensi'},{name:'Ruang Suara'}],
+    staff:[
+      {name:'Laras',role:'strategi',room:0},{name:'Bima',role:'cd',room:0},{name:'Sajak',role:'naskah',room:0},{name:'Kail',role:'hook',room:0},
+      {name:'Warna',role:'ad',room:1},{name:'Panel',role:'storyboard',room:1},
+      {name:'Arka',role:'riset',room:2},{name:'Jadwal',role:'produser',room:2},
+      {name:'Gema',role:'suara',room:3},{name:'Rangkai',role:'editor',room:3}
+    ].map((s,i)=>({...s,id:'s'+i})),
+    brief:SAMPLE_BRIEF,platform:'TikTok',dur:'30',faceless:'Tangan & POV',answer:SAMPLE_ANSWER,isSample:true};
+}
+const KEY='studio-faceless-ai-v1';
+let S;
+try{S=JSON.parse(localStorage.getItem(KEY)||'null')}catch(e){S=null}
+if(!S||!Array.isArray(S.staff))S=defaults();
+let uid=Date.now();
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+
+const $=id=>document.getElementById(id);
+
+/* ---------- prompt ---------- */
+function orderedStaff(){return S.staff.slice().sort((a,b)=>ORDER.indexOf(a.role)-ORDER.indexOf(b.role))}
+function buildPrompt(){
+  const team=orderedStaff(), n=PANELS[S.dur]||8, wide=S.platform.includes('16:9');
+  const L=[];
+  L.push(`Kamu akan memerankan tim kreatif "${S.studio}" yang sedang meeting untuk membuat satu video faceless (tanpa menampilkan wajah orang).`);
+  L.push('');
+  L.push(`BRIEF: ${S.brief.trim()||'(belum diisi)'}`);
+  L.push(`PLATFORM: ${S.platform} | FORMAT: ${wide?'16:9 horizontal':'9:16 vertikal'} | DURASI: ${S.dur} detik | GAYA FACELESS: ${S.faceless}`);
+  L.push('');
+  L.push('ANGGOTA TIM. Mereka bicara berurutan, dan tiap orang membaca serta membangun dari keputusan orang sebelumnya:');
+  team.forEach((s,i)=>L.push(`${i+1}. ${s.name} (${ROLES[s.role].label}): ${ROLES[s.role].task}`));
+  L.push('');
+  L.push('ATURAN:');
+  L.push('- Awali bagian setiap orang dengan baris persis seperti ini: ### Nama | Peran');
+  L.push('- Bahasa Indonesia, ringkas, paling banyak sekitar 90 kata per orang. Boleh tidak setuju dengan orang sebelumnya kalau ada alasan.');
+  L.push('- Wajah manusia tidak boleh terlihat. Pakai tangan, POV, b-roll, siluet, teks layar, voice-over, atau karakter animasi.');
+  L.push(`- Setelah semua orang bicara, tutup dengan baris: ### STORYBOARD PROMPT`);
+  L.push(`  Lalu tulis tepat ${n} panel dalam bahasa Inggris (siap ditempel ke alat gambar AI), satu baris per panel:`);
+  L.push('  Panel N (detik a–b): [shot & lensa] — [subjek & aksi, tanpa wajah] — [setting, cahaya, warna] — [teks layar bila ada]');
+  L.push(`  Akhiri dengan satu baris "Consistent visual style: ..." yang berlaku untuk semua panel, termasuk rasio ${wide?'16:9':'9:16'} dan "no faces".`);
+  return L.join('\n');
+}
+
+/* ---------- parse ---------- */
+function parseAnswer(txt){
+  const lines=txt.replace(/\r/g,'').split('\n');
+  const out=[]; let cur=null, sb=null, inSb=false;
+  const hdr=/^\s*(?:\*\*)?\s*#{1,4}\s*(.+?)\s*(?:\*\*)?\s*$/;
+  for(const raw of lines){
+    const m=raw.match(hdr);
+    if(m){
+      const h=m[1].replace(/\*+/g,'').trim();
+      if(/storyboard\s*prompt/i.test(h)){inSb=true;sb=[];cur=null;continue}
+      const name=h.split(/\s*[|—–:]\s*|\s+-\s+/)[0].trim();
+      let st=S.staff.find(s=>s.name.toLowerCase()===name.toLowerCase())||S.staff.find(s=>h.toLowerCase().includes(s.name.toLowerCase()));
+      if(!st){const r=Object.keys(ROLES).find(k=>h.toLowerCase().includes(ROLES[k].label.toLowerCase()));if(r)st=S.staff.find(s=>s.role===r)}
+      inSb=false; cur={staff:st||null,head:h,text:[]}; out.push(cur); continue;
+    }
+    if(inSb)sb.push(raw); else if(cur)cur.text.push(raw);
+  }
+  out.forEach(o=>o.text=o.text.join('\n').trim());
+  return {sections:out.filter(o=>o.text),storyboard:sb?sb.join('\n').trim():''};
+}
+
+/* ---------- results UI ---------- */
+let parsed={sections:[],storyboard:''};
+function initials(n){return (n||'?').trim().slice(0,2).toUpperCase()}
+function renderResults(){
+  parsed=parseAnswer(S.answer||'');
+  const box=$('cards'); box.textContent='';
+  $('sampleTag').hidden=!S.isSample||!parsed.sections.length;
+  if(!parsed.sections.length){
+    const e=document.createElement('div');e.className='empty';
+    e.textContent='Belum ada hasil. Salin perintah di langkah 01, tempel ke AI, lalu tempel jawabannya di langkah 02.';
+    box.appendChild(e);
+  }
+  parsed.sections.forEach((sec,i)=>{
+    const c=document.createElement('div');c.className='card';c.tabIndex=0;c.dataset.i=i;
+    const av=document.createElement('div');av.className='av';
+    const role=sec.staff?ROLES[sec.staff.role]:null;
+    av.style.background=role?role.color:'var(--line)';
+    if(role&&sec.staff.role==='storyboard')av.style.color='#fff';
+    av.textContent=initials(sec.staff?sec.staff.name:sec.head);
+    const body=document.createElement('div');body.style.minWidth='0';
+    const who=document.createElement('div');who.className='who';
+    who.textContent=sec.staff?sec.staff.name+' ':sec.head;
+    if(role){const r=document.createElement('span');r.className='role';r.textContent='· '+role.label;who.appendChild(r)}
+    const t=document.createElement('div');t.className='txt';t.textContent=sec.text;
+    body.append(who,t);c.append(av,body);
+    const act=()=>{speakIdx=i;speakT=0;markSpeaking()};
+    c.addEventListener('click',act);c.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();act()}});
+    box.appendChild(c);
+  });
+  $('sbBox').hidden=!parsed.storyboard;
+  $('sbText').textContent=parsed.storyboard;
+  speakIdx=0;speakT=0;markSpeaking();
+}
+function markSpeaking(){
+  document.querySelectorAll('.card').forEach(c=>c.classList.toggle('speaking',+c.dataset.i===speakIdx&&parsed.sections.length>0));
+}
+
+/* ---------- clipboard ---------- */
+async function copyText(txt,statusEl,okMsg,fallbackEl){
+  try{await navigator.clipboard.writeText(txt);setStatus(statusEl,okMsg)}
+  catch(e){
+    if(fallbackEl){const d=fallbackEl.closest('details');if(d)d.open=true;const r=document.createRange();r.selectNodeContents(fallbackEl);const s=getSelection();s.removeAllRanges();s.addRange(r)}
+    setStatus(statusEl,'Browser menolak salin otomatis. Teksnya sudah diblok, tekan Ctrl+C atau tahan lalu Salin.',true)
+  }
+}
+function setStatus(el,msg,err){el.textContent=msg;el.classList.toggle('err',!!err)}
+
+/* ---------- meeting controls ---------- */
+function syncMeetingInputs(){
+  $('brief').value=S.brief;$('platform').value=S.platform;$('dur').value=S.dur;$('faceless').value=S.faceless;$('answer').value=S.answer||'';
+  $('promptPre').textContent=buildPrompt();
+  $('hudFmt').textContent=`● REC · ${S.platform.includes('16:9')?'16:9':'9:16'} · ${S.dur}s`;
+}
+['brief','platform','dur','faceless'].forEach(k=>$(k).addEventListener('input',()=>{S[k]=$(k).value;save();$('promptPre').textContent=buildPrompt();$('hudFmt').textContent=`● REC · ${S.platform.includes('16:9')?'16:9':'9:16'} · ${S.dur}s`}));
+$('copyPrompt').addEventListener('click',()=>{
+  if(!S.brief.trim()){setStatus($('st1'),'Brief masih kosong. Tulis dulu topik dan tujuan videonya.',true);$('brief').focus();return}
+  const p=buildPrompt();$('promptPre').textContent=p;
+  copyText(p,$('st1'),'Perintah tersalin. Tim menuju ruang meeting. Tempel ke AI pilihanmu.',$('promptPre'));
+  startMeeting();
+});
+$('split').addEventListener('click',()=>{
+  S.answer=$('answer').value;S.isSample=false;save();renderResults();
+  if(parsed.sections.length){setStatus($('st2'),`Terpecah jadi ${parsed.sections.length} orang${parsed.storyboard?' + storyboard':''}.`);startMeeting()}
+  else setStatus($('st2'),'Tidak ada penanda "### Nama | Peran". Pastikan kamu menyalin seluruh jawaban AI, termasuk judul tiap bagian.',true);
+});
+$('clearAns').addEventListener('click',()=>{$('answer').value='';S.answer='';S.isSample=false;save();renderResults();setStatus($('st2'),'')});
+$('copySb').addEventListener('click',()=>copyText(parsed.storyboard,$('st3'),'Storyboard tersalin. Tempel ke alat gambar favoritmu.',$('sbText')));
+
+/* ---------- tabs ---------- */
+document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>{
+  document.querySelectorAll('.tab').forEach(x=>x.setAttribute('aria-selected',x===t));
+  ['meeting','setup','guide'].forEach(k=>$('p-'+k).hidden=k!==t.dataset.tab);
+}));
+
+/* ---------- setup UI ---------- */
+function renderSetup(){
+  $('studio').value=S.studio;
+  document.querySelectorAll('#styleSeg button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.v===S.style));
+  const rl=$('roomList');rl.textContent='';
+  S.rooms.forEach((r,i)=>{
+    const row=document.createElement('div');row.className='rrow';
+    const sw=document.createElement('span');sw.className='sw';sw.style.background=`var(${ROOM_TOK[i]})`;
+    const inp=document.createElement('input');inp.type='text';inp.value=r.name;inp.maxLength=22;inp.id='room'+i;inp.setAttribute('aria-label','Nama ruang '+(i+1));
+    inp.addEventListener('input',()=>{r.name=inp.value;save();refreshRoomSelects()});
+    const x=document.createElement('button');x.className='x';x.textContent='×';x.setAttribute('aria-label','Hapus ruang '+r.name);
+    x.disabled=S.rooms.length<=1;
+    x.addEventListener('click',()=>{
+      S.rooms.splice(i,1);
+      S.staff.forEach(s=>{if(s.room===i)s.room=-1;else if(s.room>i)s.room--});
+      S.staff.forEach(s=>{if(s.room===-1){const f=freeRoom();if(f<0)s.room=-2;else s.room=f}});
+      const dropped=S.staff.filter(s=>s.room===-2).length;
+      S.staff=S.staff.filter(s=>s.room!==-2);
+      save();renderSetup();rebuildScene();
+      setStatus($('st4'),dropped?`${dropped} staf dilepas karena ruang penuh.`:'Staf dipindah ke ruang yang masih kosong.');
+    });
+    row.append(sw,inp,x);rl.appendChild(row);
+  });
+  $('roomCount').textContent=`${S.rooms.length}/${MAX_ROOMS}`;
+  $('addRoom').disabled=S.rooms.length>=MAX_ROOMS;
+
+  const sl=$('staffList');sl.textContent='';
+  S.staff.forEach((s,i)=>{
+    const row=document.createElement('div');row.className='srow';
+    const n=document.createElement('input');n.type='text';n.value=s.name;n.maxLength=14;n.id='sn-'+s.id;n.setAttribute('aria-label','Nama staf');
+    n.addEventListener('input',()=>{s.name=n.value;save();$('promptPre').textContent=buildPrompt()});
+    const r=document.createElement('select');r.id='sr-'+s.id;r.setAttribute('aria-label','Peran '+s.name);
+    ORDER.forEach(k=>{const o=document.createElement('option');o.value=k;o.textContent=ROLES[k].label;r.appendChild(o)});r.value=s.role;
+    r.addEventListener('change',()=>{s.role=r.value;save();$('promptPre').textContent=buildPrompt()});
+    const rm=document.createElement('select');rm.className='roomSel';rm.id='sm-'+s.id;rm.setAttribute('aria-label','Ruang '+s.name);
+    rm.addEventListener('change',()=>{
+      const t=+rm.value;
+      if(S.staff.filter(x=>x.room===t&&x!==s).length>=PER_ROOM){rm.value=s.room;setStatus($('st4'),`${S.rooms[t].name} sudah penuh (4 meja).`,true);return}
+      s.room=t;save();rebuildScene();setStatus($('st4'),'')
+    });
+    const x=document.createElement('button');x.className='x';x.textContent='×';x.setAttribute('aria-label','Hapus '+s.name);
+    x.addEventListener('click',()=>{S.staff.splice(i,1);save();renderSetup();rebuildScene()});
+    row.append(n,r,rm,x);sl.appendChild(row);
+  });
+  refreshRoomSelects();
+  $('staffCount').textContent=`${S.staff.length}/${MAX_STAFF}`;
+  $('addStaff').disabled=S.staff.length>=MAX_STAFF;
+  $('title').textContent=S.studio||'Studio Tanpa Nama';
+  $('promptPre').textContent=buildPrompt();
+}
+function refreshRoomSelects(){
+  S.staff.forEach(s=>{const el=$('sm-'+s.id);if(!el)return;el.textContent='';
+    S.rooms.forEach((r,i)=>{const o=document.createElement('option');o.value=i;o.textContent=r.name||('Ruang '+(i+1));el.appendChild(o)});el.value=s.room});
+}
+function freeRoom(){for(let i=0;i<S.rooms.length;i++)if(S.staff.filter(s=>s.room===i).length<PER_ROOM)return i;return -1}
+$('studio').addEventListener('input',()=>{S.studio=$('studio').value;$('title').textContent=S.studio||'Studio Tanpa Nama';save();$('promptPre').textContent=buildPrompt()});
+document.querySelectorAll('#styleSeg button').forEach(b=>b.addEventListener('click',()=>{S.style=b.dataset.v;save();renderSetup()}));
+$('addRoom').addEventListener('click',()=>{if(S.rooms.length<MAX_ROOMS){S.rooms.push({name:'Ruang '+(S.rooms.length+1)});save();renderSetup();rebuildScene()}});
+$('addStaff').addEventListener('click',()=>{
+  const f=freeRoom();if(f<0){setStatus($('st4'),'Semua ruang penuh. Tambah ruang dulu.',true);return}
+  const used=new Set(S.staff.map(s=>s.role));const role=ORDER.find(k=>!used.has(k))||'naskah';
+  const names=['Tara','Bayu','Nala','Rimba','Senja','Kala','Dimas','Ayu','Lintang','Purnama','Wira','Sekar'];
+  const name=names.find(n=>!S.staff.some(s=>s.name===n))||'Staf';
+  S.staff.push({id:'s'+(uid++),name,role,room:f});save();renderSetup();rebuildScene();setStatus($('st4'),'')
+});
+let resetArm=false;
+$('reset').addEventListener('click',()=>{
+  if(!resetArm){resetArm=true;$('reset').textContent='Klik lagi untuk reset';setTimeout(()=>{resetArm=false;$('reset').textContent='Kembalikan ke contoh'},3000);return}
+  resetArm=false;$('reset').textContent='Kembalikan ke contoh';
+  S=defaults();save();renderSetup();syncMeetingInputs();renderResults();rebuildScene();chars={};rebuildScene();setStatus($('st4'),'Kantor kembali ke contoh.');
+});
+$('roleGuide').append(...ORDER.map(k=>{const d=document.createElement('div');const i=document.createElement('i');i.style.background=ROLES[k].color;const t=document.createElement('span');const b=document.createElement('b');b.textContent=ROLES[k].label+'. ';t.append(b,ROLES[k].task);d.append(i,t);return d}));
+
+/* ================= ISOMETRIC SCENE ================= */
+const cv=$('cv'),ctx=cv.getContext('2d');
+const W=16,D=10;
+const SLOTS=[{x:0,y:0,w:5.5,d:4.5},{x:5.5,y:0,w:5,d:4.5},{x:10.5,y:0,w:5.5,d:4.5},{x:0,y:5.5,w:5,d:4.5}];
+const MEET={x:5,y:5.5,w:5.5,d:4.5}, LOUNGE={x:10.5,y:5.5,w:5.5,d:4.5};
+const MSEATS=[];for(let i=0;i<5;i++){MSEATS.push({x:7.75+(i-2)*0.62,y:7.0},{x:7.75+(i-2)*0.62,y:8.55})}MSEATS.push({x:5.75,y:7.75},{x:9.75,y:7.75});
+const SKIN=['#F1C7A5','#D9A47E','#B07A55','#8A5A3C','#EBC09E','#C68E68'];
+const HAIR=['#2B2220','#4A3426','#1E1E24','#6B4A2E','#3A2E2A','#7A5236'];
+const FUR=['#D8B48A','#A39A92','#F0E2CF','#C98E5C','#8F8A86','#E9C9A0'];
+let col={},Sz=20,O={x:0,y:0},view={z:1,px:0,py:0},cw=0,ch=0,dpr=1;
+let chars={},meeting=false,paused=false,speakIdx=0,speakT=0,clock=0,meetClock=0;
+
+function readColors(){const cs=getComputedStyle(document.documentElement);['--bg','--ink','--muted','--surface','--line','--accent','--slab','--wall','--corr','--sign','--sign-ink','--r1','--r2','--r3','--r4','--meet','--lounge','--garden','--tree','--wood','--desk','--screen'].forEach(k=>col[k]=cs.getPropertyValue(k).trim()||'#888')}
+function shade(hex,f){let h=hex.replace('#','');if(h.length===3)h=h.split('').map(c=>c+c).join('');let n=parseInt(h,16);if(isNaN(n))return hex;let r=n>>16,g=n>>8&255,b=n&255;const t=f<0?0:255,p=Math.abs(f);r=Math.round((t-r)*p+r);g=Math.round((t-g)*p+g);b=Math.round((t-b)*p+b);return `rgb(${r},${g},${b})`}
+function P(x,y,z=0){return{X:O.x+(x-y)*Sz,Y:O.y+(x+y)*Sz*0.5-z*Sz}}
+function poly(pts,fill,stroke){ctx.beginPath();pts.forEach((p,i)=>i?ctx.lineTo(p.X,p.Y):ctx.moveTo(p.X,p.Y));ctx.closePath();ctx.fillStyle=fill;ctx.fill();if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=1;ctx.stroke()}}
+function box(x,y,z,w,d,h,c){
+  poly([P(x,y+d,z),P(x+w,y+d,z),P(x+w,y+d,z+h),P(x,y+d,z+h)],shade(c,-.1));
+  poly([P(x+w,y,z),P(x+w,y+d,z),P(x+w,y+d,z+h),P(x+w,y,z+h)],shade(c,-.2));
+  poly([P(x,y,z+h),P(x+w,y,z+h),P(x+w,y+d,z+h),P(x,y+d,z+h)],c);
+}
+function rr(x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath()}
+
+function homeSeat(slot,k){const s=SLOTS[slot];return{x:s.x+s.w*(k%2?0.7:0.3),y:s.y+(k<2?1.45:3.35)}}
+function rebuildScene(){
+  const per={};
+  S.staff.forEach((s,i)=>{
+    if(s.room>=S.rooms.length||s.room<0)s.room=Math.max(0,freeRoom());
+    const k=per[s.room]=(per[s.room]||0);per[s.room]++;
+    const h=homeSeat(s.room,Math.min(k,3));
+    let c=chars[s.id];
+    if(!c){c=chars[s.id]={x:h.x,y:h.y,path:[],phase:Math.random()*6}}
+    c.home=h;c.idx=i;
+    if(!meeting&&!c.path.length){c.x=h.x;c.y=h.y}
+    else if(!meeting){c.path=routeTo(c,h)}
+  });
+  Object.keys(chars).forEach(id=>{if(!S.staff.find(s=>s.id===id))delete chars[id]});
+  if(meeting)startMeeting(true);
+}
+function routeTo(c,t){const cy=5.0;return[{x:c.x,y:cy},{x:t.x,y:cy},{x:t.x,y:t.y}]}
+function startMeeting(silent){
+  meeting=true;if(!silent)meetClock=0;
+  orderedStaff().forEach((s,i)=>{const c=chars[s.id];if(!c)return;const t=MSEATS[i%MSEATS.length];c.mseat=t;c.path=routeTo(c,t)});
+  $('meetBtn').textContent='Kembali ke meja';
+}
+function endMeeting(){meeting=false;Object.values(chars).forEach(c=>c.path=routeTo(c,c.home));$('meetBtn').textContent='Ke ruang meeting'}
+
+function resize(){
+  dpr=Math.min(window.devicePixelRatio||1,2);
+  cw=cv.clientWidth;ch=Math.max(300,Math.min(620,cw*(cw<600?0.8:0.64)));
+  cv.style.height=ch+'px';cv.width=Math.round(cw*dpr);cv.height=Math.round(ch*dpr);
+}
+function layout(){
+  const span=W+D;
+  const base=Math.min(cw*0.94/span,ch*0.84/(span*0.5+2.2));
+  Sz=base*view.z;
+  O.x=cw/2-(W-D)*Sz/2+view.px;
+  O.y=(ch-(span*0.5*Sz+0.5*Sz-1.5*Sz))/2+view.py+Sz*0.2;
+}
+
+/* --- furniture --- */
+function drawDesk(x,y){
+  box(x+.08,y+.08,0,.08,.08,.42,col['--wood']);box(x+.84,y+.08,0,.08,.08,.42,col['--wood']);
+  box(x+.08,y+.42,0,.08,.08,.42,col['--wood']);box(x+.84,y+.42,0,.08,.08,.42,col['--wood']);
+  box(x,y,.42,1,.58,.07,col['--desk']);
+  box(x+.3,y+.1,.49,.42,.06,.3,col['--screen']);
+  box(x+.36,y+.3,.49,.28,.18,.02,shade(col['--screen'],.3));
+}
+function drawChair(x,y){box(x-.2,y-.2,0,.4,.4,.28,col['--screen']);box(x-.2,y-.26,.28,.4,.08,.45,shade(col['--screen'],.15))}
+function drawStool(x,y,c){box(x-.17,y-.17,0,.34,.34,.26,c)}
+function drawPlant(x,y,s=1){box(x-.15*s,y-.15*s,0,.3*s,.3*s,.3*s,'#C8B8A6');const p=P(x,y,.3*s+.28*s);ctx.fillStyle=col['--tree'];ctx.beginPath();ctx.arc(p.X,p.Y,.28*s*Sz,0,7);ctx.fill();ctx.fillStyle=shade(col['--tree'],.18);ctx.beginPath();ctx.arc(p.X-.08*Sz,p.Y-.1*Sz,.13*s*Sz,0,7);ctx.fill()}
+function drawTree(x,y,s=1){const b=P(x,y,0);ctx.fillStyle='#8A6A4C';ctx.fillRect(b.X-.05*Sz,b.Y-.3*Sz,.1*Sz,.3*Sz);
+  for(let k=0;k<3;k++){const yy=b.Y-(.25+k*.32)*Sz*s,w=(.42-k*.1)*Sz*s;ctx.fillStyle=shade(col['--tree'],k*.07-.05);ctx.beginPath();ctx.moveTo(b.X-w,yy);ctx.lineTo(b.X+w,yy);ctx.lineTo(b.X,yy-.55*Sz*s);ctx.closePath();ctx.fill()}}
+function drawWhiteboard(x,y){box(x,y,0.35,1.8,.06,.95,'#F7F7F3');const notes=['#F6D365','#F29E8E','#9ED3B4','#9CC3EA','#D8B6F0'];for(let i=0;i<5;i++){const a=P(x+.2+i*.32,y+.06,.85+(i%2)*.25);ctx.fillStyle=notes[i];ctx.beginPath();ctx.moveTo(a.X,a.Y);const b=P(x+.42+i*.32,y+.06,.85+(i%2)*.25),c=P(x+.42+i*.32,y+.06,1.05+(i%2)*.25),d=P(x+.2+i*.32,y+.06,1.05+(i%2)*.25);ctx.lineTo(b.X,b.Y);ctx.lineTo(c.X,c.Y);ctx.lineTo(d.X,d.Y);ctx.closePath();ctx.fill()}}
+
+/* --- characters --- */
+function drawChar(s,c,t){
+  const u=Sz, role=ROLES[s.role]||ROLES.naskah, walking=c.path.length>0;
+  const p=P(c.x,c.y,0);
+  const bob=paused?0:Math.sin(t*2.2+c.phase)*.025*u;
+  const seated=!walking;
+  const chibi=S.style!=='manusia';
+  const bodyH=chibi?.42*u:.62*u, bodyW=chibi?.44*u:.42*u, headR=chibi?.31*u:.2*u;
+  const lift=seated?.22*u:.32*u;
+  ctx.fillStyle='rgba(0,0,0,.18)';ctx.beginPath();ctx.ellipse(p.X,p.Y,.3*u,.13*u,0,0,7);ctx.fill();
+  const bx=p.X, by=p.Y-lift+bob;
+  // legs
+  if(walking){const sw=Math.sin(t*10+c.phase)*.07*u;ctx.fillStyle=shade(role.color,-.45);ctx.fillRect(bx-.13*u+sw,by-.02*u,.1*u,lift-.02*u);ctx.fillRect(bx+.03*u-sw,by-.02*u,.1*u,lift-.02*u)}
+  // body
+  ctx.fillStyle=role.color;rr(bx-bodyW/2,by-bodyH,bodyW,bodyH,.14*u);ctx.fill();
+  ctx.fillStyle=shade(role.color,-.12);rr(bx-bodyW/2,by-bodyH*.35,bodyW,bodyH*.35,.1*u);ctx.fill();
+  const hy=by-bodyH-headR*.82;
+  const i=c.idx||0;
+  if(S.style==='hewan'){
+    const fur=FUR[i%FUR.length], kind=i%3;
+    ctx.fillStyle=shade(fur,-.1);
+    if(kind===0){[-1,1].forEach(sd=>{ctx.beginPath();ctx.moveTo(bx+sd*headR*.85,hy-headR*.2);ctx.lineTo(bx+sd*headR*.55,hy-headR*1.25);ctx.lineTo(bx+sd*headR*.1,hy-headR*.75);ctx.closePath();ctx.fill()})}
+    else if(kind===1){[-1,1].forEach(sd=>{ctx.beginPath();ctx.arc(bx+sd*headR*.72,hy-headR*.72,headR*.36,0,7);ctx.fill()})}
+    else{[-1,1].forEach(sd=>{ctx.beginPath();ctx.ellipse(bx+sd*headR*.38,hy-headR*1.25,headR*.2,headR*.6,sd*.15,0,7);ctx.fill()})}
+    ctx.fillStyle=fur;ctx.beginPath();ctx.arc(bx,hy,headR,0,7);ctx.fill();
+    ctx.fillStyle=shade(fur,.55);ctx.beginPath();ctx.ellipse(bx,hy+headR*.35,headR*.42,headR*.3,0,0,7);ctx.fill();
+    ctx.fillStyle='#2A2422';ctx.beginPath();ctx.arc(bx,hy+headR*.24,headR*.09,0,7);ctx.fill();
+  }else{
+    const skin=SKIN[i%SKIN.length],hair=HAIR[(i*2)%HAIR.length];
+    ctx.fillStyle=skin;ctx.beginPath();ctx.arc(bx,hy,headR,0,7);ctx.fill();
+    ctx.fillStyle=hair;ctx.beginPath();ctx.arc(bx,hy-headR*.12,headR*1.04,Math.PI*1.02,Math.PI*1.98);ctx.fill();
+    if(i%3===1){ctx.beginPath();ctx.arc(bx+headR*.8,hy+headR*.2,headR*.35,0,7);ctx.fill()}
+  }
+  ctx.fillStyle='#22201E';const ey=hy+headR*(S.style==='hewan'?-.05:.12),ex=headR*(chibi?.36:.38),er=Math.max(1.2,headR*(chibi?.1:.09));
+  const blink=(Math.sin(t*.9+c.phase*3)>.985)&&!paused;
+  if(blink){ctx.fillRect(bx-ex-er,ey,er*2,1.2);ctx.fillRect(bx+ex-er,ey,er*2,1.2)}else{ctx.beginPath();ctx.arc(bx-ex,ey,er,0,7);ctx.arc(bx+ex,ey,er,0,7);ctx.fill()}
+  if(chibi){ctx.fillStyle='rgba(240,120,120,.35)';ctx.beginPath();ctx.arc(bx-ex*1.35,ey+headR*.28,headR*.13,0,7);ctx.arc(bx+ex*1.35,ey+headR*.28,headR*.13,0,7);ctx.fill()}
+  c.top={X:bx,Y:hy-headR*(S.style==='hewan'?1.5:1.15)};
+}
+
+/* --- labels --- */
+function pill(x,y,text,dot,size){
+  ctx.font=`600 ${size}px "Plus Jakarta Sans", system-ui, sans-serif`;
+  const w=ctx.measureText(text).width+size*1.9,h=size*1.75;
+  ctx.fillStyle=col['--surface'];ctx.strokeStyle=col['--line'];ctx.lineWidth=1;rr(x-w/2,y-h/2,w,h,h/2);ctx.fill();ctx.stroke();
+  ctx.fillStyle=dot;ctx.beginPath();ctx.arc(x-w/2+size*.8,y,size*.3,0,7);ctx.fill();
+  ctx.fillStyle=col['--ink'];ctx.textBaseline='middle';ctx.fillText(text,x-w/2+size*1.3,y+.5);
+}
+function bubble(x,y,text){
+  const size=Math.max(10,Math.min(13,Sz*.42));ctx.font=`500 ${size}px "Plus Jakarta Sans", system-ui, sans-serif`;
+  const w=Math.min(ctx.measureText(text).width+16,cw*.6),h=size*1.9;
+  let bx=Math.max(4,Math.min(cw-w-4,x-w/2));const by=y-h-8;
+  ctx.fillStyle=col['--ink'];rr(bx,by,w,h,8);ctx.fill();
+  ctx.beginPath();ctx.moveTo(x-5,by+h);ctx.lineTo(x+5,by+h);ctx.lineTo(x,by+h+6);ctx.closePath();ctx.fill();
+  ctx.fillStyle=col['--bg'];ctx.textBaseline='middle';ctx.save();ctx.beginPath();ctx.rect(bx,by,w-6,h);ctx.clip();ctx.fillText(text,bx+8,by+h/2+.5);ctx.restore();
+}
+
+function draw(t){
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  ctx.clearRect(0,0,cw,ch);
+  layout();
+  // slab + floors
+  box(-.15,-.15,-.45,W+.3,D+.3,.45,col['--slab']);
+  poly([P(0,0),P(W,0),P(W,D),P(0,D)],col['--corr']);
+  const usedSlots=S.rooms.length;
+  SLOTS.forEach((s,i)=>box(s.x+.08,s.y+.08,0,s.w-.16,s.d-.16,.05,i<usedSlots?col[ROOM_TOK[i]]:col['--garden']));
+  box(MEET.x+.08,MEET.y+.08,0,MEET.w-.16,MEET.d-.16,.05,col['--meet']);
+  box(LOUNGE.x+.08,LOUNGE.y+.08,0,LOUNGE.w-.16,LOUNGE.d-.16,.05,col['--lounge']);
+  // rug in lounge
+  poly([P(11.6,7.1,.06),P(14.6,7.1,.06),P(14.6,9.2,.06),P(11.6,9.2,.06)],shade(col['--lounge'],.25));
+  // walls
+  box(-.15,0,0,.15,D,1.5,col['--wall']);
+  box(-.15,-.15,0,W+.15,.15,1.5,col['--wall']);
+  // studio sign on back wall
+  const name=(S.studio||'Studio').toUpperCase();
+  const fs=Math.max(7,.3*Sz);ctx.font=`800 ${fs}px "Bricolage Grotesque", system-ui, sans-serif`;
+  const len=Math.min(5.5,ctx.measureText(name).width/Sz+.7);
+  const sx=0.5;poly([P(sx,0,.62),P(sx+len,0,.62),P(sx+len,0,1.22),P(sx,0,1.22)],col['--sign']);
+  const tp=P(sx+.35,0,.82);ctx.save();ctx.translate(tp.X,tp.Y);ctx.transform(1,.5,0,1,0,0);ctx.fillStyle=col['--sign-ink'];ctx.textBaseline='alphabetic';ctx.fillText(name,0,0);ctx.restore();
+  // meeting screen on back wall
+  const mx=11.2;poly([P(mx,0,.5),P(mx+3.2,0,.5),P(mx+3.2,0,1.3),P(mx,0,1.3)],col['--sign']);
+  const mp=P(mx+.25,0,1.0);ctx.save();ctx.translate(mp.X,mp.Y);ctx.transform(1,.5,0,1,0,0);ctx.fillStyle=col['--accent'];ctx.font=`700 ${Math.max(5,.19*Sz)}px "JetBrains Mono", monospace`;ctx.fillText('● BRIEF → STORYBOARD',0,0);ctx.restore();
+  // whiteboard on left wall
+  {const y0=1.2,len=2.2;poly([P(0,y0,.45),P(0,y0+len,.45),P(0,y0+len,1.25),P(0,y0,1.25)],'#F7F7F3');
+   const notes=['#F6D365','#F29E8E','#9ED3B4','#9CC3EA','#D8B6F0','#F6D365'];notes.forEach((nc,k)=>{const yy=y0+.2+(k%3)*.65,zz=.6+(k>2?.33:0);poly([P(0,yy,zz),P(0,yy+.42,zz),P(0,yy+.42,zz+.25),P(0,yy,zz+.25)],nc)})}
+
+  // objects (depth sorted)
+  const objs=[];
+  const add=(d,f)=>objs.push({d,f});
+  S.staff.forEach(s=>{const c=chars[s.id];if(!c)return;const h=c.home;
+    add(h.x+h.y-.3,()=>drawChair(h.x,h.y-.05));
+    add(h.x+h.y+.6,()=>drawDesk(h.x-.5,h.y+.25));
+    add(c.x+c.y+(c.path.length?0:.01),()=>drawChar(s,c,t));
+  });
+  // unused slots → garden
+  SLOTS.forEach((s,i)=>{if(i<usedSlots)return;
+    [[.9,.9],[s.w-.9,1.1],[1.4,s.d-1],[s.w-1.2,s.d-.8],[s.w/2,s.d/2-.6]].forEach(([dx,dy],k)=>add(s.x+dx+s.y+dy,()=>drawTree(s.x+dx,s.y+dy,.9+(k%2)*.25)));
+    add(s.x+s.w/2+s.y+s.d/2+.4,()=>box(s.x+s.w/2-.7,s.y+s.d/2+.3,0,1.4,.4,.3,col['--wood']));
+  });
+  // plants in used rooms
+  SLOTS.forEach((s,i)=>{if(i>=usedSlots)return;add(s.x+s.w-.4+s.y+.4,()=>drawPlant(s.x+s.w-.45,s.y+.45));add(s.x+.4+s.y+s.d-.4,()=>drawPlant(s.x+.45,s.y+s.d-.45,.85))});
+  // meeting room
+  MSEATS.forEach((m,k)=>add(m.x+m.y-.05,()=>drawStool(m.x,m.y,k%2?'#8E86B8':'#6E67A0')));
+  add(7.75+7.75,()=>{box(6.05,7.4,.42,3.4,.72,.08,col['--wood']);box(6.2,7.55,0,.1,.1,.42,shade(col['--wood'],-.2));box(10.1-.4,7.55,0,.1,.1,.42,shade(col['--wood'],-.2));box(6.2,7.95,0,.1,.1,.42,shade(col['--wood'],-.2));box(9.7,7.95,0,.1,.1,.42,shade(col['--wood'],-.2))});
+  add(5.4+5.9,()=>drawPlant(5.4,5.9));
+  // lounge
+  add(11.2+6.4,()=>{box(10.9,5.9,0,2.6,.7,.95,'#EDE7E0');box(11.1,5.95,.95,.5,.5,.5,'#2F3436');box(12.5,5.95,.95,.3,.3,.18,'#F7F7F3')});
+  add(12+8.8,()=>{box(11.9,8.4,0,2.0,.7,.32,'#B9A6C9');box(11.9,8.85,.32,2.0,.25,.35,'#A592B6')});
+  add(13.1+7.5,()=>{box(12.6,7.3,0,1.0,.6,.28,col['--wood'])});
+  add(15.3+6.2,()=>drawPlant(15.4,6.1,1.1));add(15.2+9.4,()=>drawTree(15.3,9.4,.8));add(10.9+9.5,()=>drawTree(10.9,9.5,.7));
+  [[14.6,7.6,'#F6D365'],[14.9,8.4,'#9ED3B4']].forEach(([x,y,cc])=>add(x+y,()=>{const p=P(x,y,.2);ctx.fillStyle=cc;ctx.beginPath();ctx.ellipse(p.X,p.Y,.3*Sz,.2*Sz,0,0,7);ctx.fill()}));
+  objs.sort((a,b)=>a.d-b.d).forEach(o=>o.f());
+
+  // labels
+  const ls=Math.max(9,Math.min(13,Sz*.38));
+  SLOTS.forEach((s,i)=>{if(i>=usedSlots)return;const p=P(s.x+s.w/2,s.y+s.d-.35,0);pill(p.X,p.Y,S.rooms[i].name||'Ruang',col[ROOM_TOK[i]]==='#888'?'#999':shade(col[ROOM_TOK[i]],-.35),ls)});
+  {const p=P(MEET.x+MEET.w/2,MEET.y+MEET.d-.35);pill(p.X,p.Y,'Ruang Meeting',shade(col['--meet'],-.35),ls)}
+  {const p=P(LOUNGE.x+LOUNGE.w/2+.6,LOUNGE.y+.75);pill(p.X,p.Y,'Lounge',shade(col['--lounge'],-.35),ls)}
+  const ns=Math.max(8,Math.min(11.5,Sz*.32));
+  S.staff.forEach(s=>{const c=chars[s.id];if(!c||!c.top)return;pill(c.top.X,c.top.Y-ns*.9,s.name,(ROLES[s.role]||ROLES.naskah).color,ns)});
+  // speaking bubble
+  const sec=parsed.sections[speakIdx];
+  if(sec&&sec.staff&&chars[sec.staff.id]&&chars[sec.staff.id].top){
+    const c=chars[sec.staff.id];let line=sec.text.split('\n').find(l=>l.trim())||'';line=line.replace(/^[-*\d.\s]+/,'').trim();
+    if(line.length>38)line=line.slice(0,37).trim()+'…';
+    bubble(c.top.X,c.top.Y-ns*1.9,line);
+  }
+}
+
+let last=performance.now(),frame=0;
+function tick(now){
+  const dt=Math.min(.05,(now-last)/1000);last=now;
+  if(!paused){
+    clock+=dt;if(meeting)meetClock+=dt;
+    Object.values(chars).forEach(c=>{
+      if(!c.path.length)return;
+      let step=2.6*dt;
+      while(step>0&&c.path.length){const w=c.path[0],dx=w.x-c.x,dy=w.y-c.y,d=Math.hypot(dx,dy);
+        if(d<=step){c.x=w.x;c.y=w.y;c.path.shift();step-=d}else{c.x+=dx/d*step;c.y+=dy/d*step;step=0}}
+    });
+    if(parsed.sections.length>1){speakT+=dt;if(speakT>3.6){speakT=0;speakIdx=(speakIdx+1)%parsed.sections.length;markSpeaking()}}
+    const f=Math.floor(meetClock*25)%25,sec=Math.floor(meetClock)%60,min=Math.floor(meetClock/60)%60,hr=Math.floor(meetClock/3600);
+    if(frame%6===0)$('tc').textContent=`TC ${[hr,min,sec,f].map(v=>String(v).padStart(2,'0')).join(':')}`;
+  }
+  if(frame%90===0)readColors();
+  frame++;
+  draw(clock);
+  requestAnimationFrame(tick);
+}
+
+/* controls */
+function setZ(z){view.z=z;cv.style.touchAction=z>1?'none':'pan-y'}
+$('zIn').addEventListener('click',()=>setZ(Math.min(2.6,view.z*1.25)));
+$('zOut').addEventListener('click',()=>setZ(Math.max(.6,view.z/1.25)));
+$('zFit').addEventListener('click',()=>{view.px=0;view.py=0;setZ(1)});
+$('pause').addEventListener('click',()=>{paused=!paused;$('pause').textContent=paused?'Putar':'Jeda'});
+$('meetBtn').addEventListener('click',()=>meeting?endMeeting():startMeeting());
+let drag=null;
+cv.addEventListener('pointerdown',e=>{if(e.pointerType!=='mouse'&&view.z<=1)return;drag={x:e.clientX,y:e.clientY,px:view.px,py:view.py};cv.setPointerCapture(e.pointerId)});
+cv.addEventListener('pointermove',e=>{if(!drag)return;view.px=drag.px+e.clientX-drag.x;view.py=drag.py+e.clientY-drag.y});
+cv.addEventListener('pointerup',()=>drag=null);
+window.addEventListener('resize',resize);
+try{matchMedia('(prefers-color-scheme: dark)').addEventListener('change',readColors)}catch(e){}
+if(matchMedia('(prefers-reduced-motion: reduce)').matches){paused=true;$('pause').textContent='Putar'}
+
+readColors();resize();renderSetup();syncMeetingInputs();rebuildScene();renderResults();
+requestAnimationFrame(tick);
+})();
+</script>
